@@ -1,45 +1,56 @@
-//#include <CurieTime.h>
-/*
-  
- Grupo: Israel e Oseias.
- 
- Semaforo de transito com semaforo de pedestres.
- 
+/* arduino-traffic-light.ino
+ *
+ * Copyright 2019 Oseias Rocha & Israel Cristiano Korndorfer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+//#include <CurieTime.h>
 
-// numeros dos pinos
+// pinout
 int c_r = 12;
 int c_y = 11;
 int c_g = 10;
 int p_r = 9;
 int p_g = 8;
 
-// pino 0 da interrupçao eh o pino 2 digital
+// interrupt 0 is button pin 2
 int int_button = 0;
 
-// variavel de controle para aceitar somente uma diminuiçao no tempo do semaforo
+// controls reduction time
 int controller = 1;
 
-// tempos da sinaleira
+// traffic lights times
 
-// vermelho para carros
+// car red
 long time_c_r = 10000;
-// amarelo para carros
+// car yellow
 long time_c_y = 5000;
-// verde para carros
+// car green
 long time_c_g = 15000;
 
-// tempo que o botao ira diminuir do tempo da luz verde dos carros
+// car green reduction time if button pressed
 long time_button = 10000;
 
-// tempo que o sinal vermelho do pedestre pisca antes de ficar vermelho
+// pedestrian red blink time
 long time_ped = 2500;
 
-// variaveis de auxilio para calculo do tempo
+// auxiliary variables to calculate time
 unsigned long prev_time = 0, now_time = 0;
 
 void setup() {                
-  // inicializando os pinos
+  // pin initialization
   pinMode(c_r, OUTPUT);
   pinMode(c_y, OUTPUT);
   pinMode(c_g, OUTPUT);
@@ -47,7 +58,7 @@ void setup() {
   pinMode(p_g, OUTPUT);
   pinMode(int_button+2, INPUT);
 
-  // configuraçao da interrupçao pelo botao
+  // button interrurupt configuration
   attachInterrupt(int_button, decrease_time, RISING);
 }
 
@@ -60,7 +71,7 @@ void decrease_time(){
 
 void loop() {
   if(now_time == 0){
-    // inicializa sinaleira
+    // initial disposition of lights
     digitalWrite(c_r, LOW);
     digitalWrite(c_g, HIGH);
     digitalWrite(c_y, LOW);
@@ -68,32 +79,32 @@ void loop() {
     digitalWrite(p_g, LOW);
   }else{
     if ((now_time - prev_time) >= time_c_g && digitalRead(c_g) == HIGH){
-      // verde para amarelo (carros)
+      // green to yellow (cars)
       digitalWrite(c_g, LOW);
       digitalWrite(c_y, HIGH);
       prev_time = now_time;
     }else if((now_time - prev_time) >= time_c_y && digitalRead(c_y) == HIGH){
-      // amarelo para vermelho (carros)
+      // yellow to red (cars)
       digitalWrite(c_y, LOW);
       digitalWrite(c_r, HIGH);
       delay(1000);
-      // vermelho para verde (pedestres)
+      // red to green (pedestrian)
       digitalWrite(p_r, LOW);
       digitalWrite(p_g, HIGH);
       prev_time = now_time;
     }else if((now_time - prev_time) >= time_c_r && digitalRead(c_r) == HIGH){
-      // vermelho (pedestres)
+      // red (pedestrian)
       digitalWrite(p_r, HIGH);
       delay(1000);
-      // vermelho para verde(carros)
+      // red to green (cars)
       digitalWrite(c_r, LOW);
       digitalWrite(c_g, HIGH);
       controller = 1;
       prev_time = now_time;
     }else if((now_time - prev_time) >= (time_c_r - time_ped) && digitalRead(c_r) == HIGH){
-      // verde para vermelho (pedestres)
+      // green to red (pedestrian)
       digitalWrite(p_g, LOW);
-      // pisca luz vermelha (pedestres)
+      // blink red (pedestrian)
       if ((now_time - prev_time) % 500 == 0){
         digitalWrite(p_r, !digitalRead(p_r));
       }
