@@ -25,8 +25,8 @@ int c_g = 10;
 int p_r = 9;
 int p_g = 8;
 
-// interrupt 0 is button pin 2
-int int_button = 0;
+// interrupt button pin 2
+int int_button = 2;
 
 // controls reduction time
 int controller = 1;
@@ -56,10 +56,10 @@ void setup() {
   pinMode(c_g, OUTPUT);
   pinMode(p_r, OUTPUT);
   pinMode(p_g, OUTPUT);
-  pinMode(int_button+2, INPUT);
+  pinMode(int_button, INPUT);
 
   // button interrurupt configuration
-  attachInterrupt(int_button, decrease_time, RISING);
+  attachInterrupt(digitalPinToInterrupt(int_button), decrease_time, RISING);
 }
 
 void decrease_time(){
