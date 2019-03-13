@@ -58,6 +58,13 @@ void setup() {
   pinMode(p_g, OUTPUT);
   pinMode(int_button, INPUT);
 
+  // initial disposition of lights
+  digitalWrite(c_r, LOW);
+  digitalWrite(c_g, HIGH);
+  digitalWrite(c_y, LOW);
+  digitalWrite(p_r, HIGH);
+  digitalWrite(p_g, LOW);
+
   // button interrurupt configuration
   attachInterrupt(digitalPinToInterrupt(int_button), decrease_time, RISING);
 }
@@ -70,14 +77,6 @@ void decrease_time(){
 }
 
 void loop() {
-  if(now_time == 0){
-    // initial disposition of lights
-    digitalWrite(c_r, LOW);
-    digitalWrite(c_g, HIGH);
-    digitalWrite(c_y, LOW);
-    digitalWrite(p_r, HIGH);
-    digitalWrite(p_g, LOW);
-  }else{
     if ((now_time - prev_time) >= time_c_g && digitalRead(c_g) == HIGH){
       // green to yellow (cars)
       digitalWrite(c_g, LOW);
@@ -107,8 +106,8 @@ void loop() {
       // blink red (pedestrian)
       if ((now_time - prev_time) % 500 == 0){
         digitalWrite(p_r, !digitalRead(p_r));
+        delay(1);
       }
     }
-  }
   now_time = millis();
 }
